@@ -1,0 +1,20 @@
+{
+  "name": "app_gestion_temps",
+  "version": "1.0.0",
+  "description": "Cette version est une version web simple de mon application de gestion de tâches.",
+  "homepage": "https://github.com/Louis-Bourgoin/app_gestion_temps#readme",
+  "bugs": {
+    "url": "https://github.com/Louis-Bourgoin/app_gestion_temps/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Louis-Bourgoin/app_gestion_temps.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "renderer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

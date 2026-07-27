@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Gestionnaire de tâches</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Organisation</p>
+        <h1>Mes tâches</h1>
+      </div>
+      <div class="stats-card">
+        <span id="stats-total">0 tâche</span>
+        <span id="stats-active">0 En cours</span>
+        <span id="stats-archived">0 archivée</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel input-panel">
+        <h2>Nouvelle tâche</h2>
+
+        <label for="task-input" class="field-label">Description</label>
+        <textarea
+          id="task-input"
+          placeholder="Écris ta tâche ici..."
+          rows="5"
+        ></textarea>
+
+        <div class="form-grid">
+          <label class="checkbox-card" for="important-input">
+            <input type="checkbox" id="important-input">
+            <span>Important</span>
+          </label>
+
+          <div>
+            <label for="deadline-input" class="field-label">Deadline</label>
+            <input id="deadline-input" type="date">
+          </div>
+        </div>
+
+        <button id="add-task" class="primary-btn">Ajouter la tâche</button>
+
+        <div class="filters-card">
+          <label for="search-input" class="field-label">Recherche</label>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Rechercher une tâche..."
+          >
+
+          <div id="filter-buttons" class="filter-buttons">
+            <button type="button" class="filter-btn active" data-filter="all">Toutes</button>
+            <button type="button" class="filter-btn" data-filter="active">En cours</button>
+            <button type="button" class="filter-btn" data-filter="archived">Archivées</button>
+            <button type="button" class="filter-btn" data-filter="important">Importantes</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel list-panel">
+        <div class="panel-title-row">
+          <h2>Tâches</h2>
+          <span id="todo-count" class="count-pill">0</span>
+        </div>
+        <div id="todo-zone" class="task-list empty-state-host"></div>
+      </section>
+
+      <section class="panel list-panel">
+        <div class="panel-title-row">
+          <h2>Archives</h2>
+          <span id="archive-count" class="count-pill">0</span>
+        </div>
+        <div id="archive-zone" class="task-list empty-state-host"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
