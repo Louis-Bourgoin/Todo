@@ -42,39 +42,82 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // Stockage
   // =========================
+   const STORAGE_KEY = "todo-app:v1";
+  const LEGACY_KEY = "tasks"; // ancienne clé, lue une fois pour ne rien perdre
+  const errorBanner = document.getElementById("error-banner");
+
+  function showError(message) {
+    errorBanner.textContent = message;
+    errorBanner.hidden = false;
+  }
+
+  function hideError() {
+    errorBanner.hidden = true;
+  }
+
+  // Nettoie ce qu'on lit : on ne fait jamais confiance au stockage.
+  function sanitizeTasks(parsed) {
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((task) => ({
+      id:
+        typeof task.id === "string" || typeof task.id === "number"
+          ? String(task.id)
+          : crypto.randomUUID(),
+      text: typeof task.text === "string" ? task.text : "",
+      archived: Boolean(task.archived),
+      important: Boolean(task.important),
+      deadline: typeof task.deadline === "string" ? task.deadline : "",
+      createdAt:
+        typeof task.createdAt === "string"
+          ? task.createdAt
+          : new Date().toISOString(),
+    }));
+  }
+
+  // L'ancien format est un tableau, le nouveau est { version, tasks }.
+  function readStored(key) {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    return Array.isArray(data) ? data : data.tasks;
+  }
+
   function loadTasks() {
-    try {
-      const raw = localStorage.getItem("tasks");
-      const parsed = raw ? JSON.parse(raw) : [];
-
-      tasks = Array.isArray(parsed)
-        ? parsed.map((task) => ({
-            // On garde l'id si c'est une string ou un nombre,
-            // sinon on en génère un propre.
-            id:
-              typeof task.id === "string" || typeof task.id === "number"
-                ? String(task.id)
-                : crypto.randomUUID(),
-
-            // On sécurise les types pour éviter les données cassées.
-            text: typeof task.text === "string" ? task.text : "",
-            archived: Boolean(task.archived),
-            important: Boolean(task.important),
-            deadline: typeof task.deadline === "string" ? task.deadline : "",
-            createdAt:
-              typeof task.createdAt === "string"
-                ? task.createdAt
-                : new Date().toISOString(),
-          }))
-        : [];
-    } catch (error) {
-      console.error("Erreur de lecture localStorage :", error);
-      tasks = [];
+    // On essaie dans l'ordre : données actuelles, copie précédente, ancien format.
+    for (const key of [STORAGE_KEY, `${STORAGE_KEY}:previous`, LEGACY_KEY]) {
+      try {
+        const stored = readStored(key);
+        if (Array.isArray(stored)) {
+          tasks = sanitizeTasks(stored);
+          return;
+        }
+      } catch (error) {
+        console.error(`Lecture impossible (${key}) :`, error);
+      }
     }
+    tasks = [];
   }
 
   function saveTasks() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    try {
+      const current = localStorage.getItem(STORAGE_KEY);
+      if (current) localStorage.setItem(`${STORAGE_KEY}:previous`, current);
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          version: 1,
+          savedAt: new Date().toISOString(),
+          tasks,
+        })
+      );
+      hideError();
+      return true;
+    } catch (error) {
+      console.error("Sauvegarde impossible :", error);
+      showError("Sauvegarde impossible : tes dernières modifications ne sont pas enregistrées.");
+      return false;
+    }
   }
 
   // =========================
